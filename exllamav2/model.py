@@ -72,7 +72,6 @@ class ExLlamaV2DeviceTensors:
 
 
     def get_scratch_slice(self, size_bytes):
-
         if self.scratch is None: self.prepare(True)
 
         size_bytes = ((size_bytes + 127) // 128) * 128
@@ -127,36 +126,36 @@ class ExLlamaV2:
 
         # Build model
 
-        self.modules.append(ExLlamaV2Embedding(self, "model.embed_tokens"))
-        self.modules_dict[self.modules[-1].key] = self.modules[-1]
+        #self.modules.append(ExLlamaV2Embedding(self, "model.embed_tokens"))
+        #self.modules_dict[self.modules[-1].key] = self.modules[-1]
 
-        for layer_idx in range(self.config.num_hidden_layers):
+        #for layer_idx in range(self.config.num_hidden_layers):
 
-            self.modules.append(ExLlamaV2Attention(self, f"model.layers.{layer_idx}", layer_idx))
-            for m in self.modules[-1].submodules: self.modules_dict[m.key] = m
-            if self.config.architecture == "Mixtral":
-                self.modules.append(ExLlamaV2MoEMLP(self, f"model.layers.{layer_idx}", layer_idx))
-            else:
-                self.modules.append(ExLlamaV2MLP(self, f"model.layers.{layer_idx}", layer_idx))
-            for m in self.modules[-1].submodules: self.modules_dict[m.key] = m
+            #self.modules.append(ExLlamaV2Attention(self, f"model.layers.{layer_idx}", layer_idx))
+            #for m in self.modules[-1].submodules: self.modules_dict[m.key] = m
+            #if self.config.architecture == "Mixtral":
+                #self.modules.append(ExLlamaV2MoEMLP(self, f"model.layers.{layer_idx}", layer_idx))
+            #else:
+                #self.modules.append(ExLlamaV2MLP(self, f"model.layers.{layer_idx}", layer_idx))
+            #for m in self.modules[-1].submodules: self.modules_dict[m.key] = m
 
 
-        self.modules.append(ExLlamaV2RMSNorm(self, "model.norm"))
-        self.modules_dict[self.modules[-1].key] = self.modules[-1]
+        #self.modules.append(ExLlamaV2RMSNorm(self, "model.norm"))
+        #self.modules_dict[self.modules[-1].key] = self.modules[-1]
 
-        self.head_layer_idx = len(self.modules)
-        self.modules.append(ExLlamaV2Linear(self, "lm_head", self.config.hidden_size, self.config.vocab_size, False))
-        self.modules_dict[self.modules[-1].key] = self.modules[-1]
+        #self.head_layer_idx = len(self.modules)
+        #self.modules.append(ExLlamaV2Linear(self, "lm_head", self.config.hidden_size, self.config.vocab_size, False))
+        #self.modules_dict[self.modules[-1].key] = self.modules[-1]
 
-        # Find last layer that affects k/v cache
+        ## Find last layer that affects k/v cache
 
-        layer_idx = len(self.modules)
-        while True:
-            layer_idx -= 1
-            if isinstance(self.modules[layer_idx], ExLlamaV2Attention):
-                break
+        #layer_idx = len(self.modules)
+        #while True:
+            #layer_idx -= 1
+            #if isinstance(self.modules[layer_idx], ExLlamaV2Attention):
+                #break
 
-        self.last_kv_layer_idx = layer_idx
+        #self.last_kv_layer_idx = layer_idx
 
 
     def set_device_map(self, allocation, embed_cpu = True):
@@ -189,10 +188,12 @@ class ExLlamaV2:
 
             # Special case for token embeddings on CPU
 
+            """
             if idx == 0 and embed_cpu:
 
                 module.set_device_idx(-1)
                 continue
+            """
 
             # Special case for attention
 
